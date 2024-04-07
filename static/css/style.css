@@ -1,0 +1,26 @@
+.mars-one{
+float: right;
+padding-top: 10px;
+}
+h4{
+color: lightgrey;
+padding-left: 20px;
+}
+th{
+background-color: #dddddd;
+padding-top: 10px;
+padding-bottom: 10px;
+padding-left: 10px;
+padding-right: 10px;
+}
+td{
+background-color: #eeeeff;
+padding-top: 10px;
+padding-bottom: 10px;
+padding-left: 10px;
+padding-right: 10px;
+}
+table, th, td{
+width: 100%;
+border: 1px solid black;
+}
