@@ -4,14 +4,26 @@ from werkzeug.security import generate_password_hash
 
 from data import db_session
 from data.users import User
+from data.jobs import Jobs
 from login_form import LoginForm, RegistrationForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-db_session.global_init('database.db')
+db_session.global_init('db/mars.db')
 db_sess = db_session.create_session()
+
+
+def add_job(db_sess, team_leader, job_name, work_size, collaborators, is_finished):
+    job = Jobs()
+    job.team_leader = team_leader
+    job.job = job_name
+    job.work_size = work_size
+    job.collaborators = ', '.join(map(str, collaborators))
+    job.is_finished = is_finished
+    db_sess.add(job)
+    db_sess.commit()
 
 
 @login_manager.user_loader
@@ -21,7 +33,18 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('base.html', title='Главная страница')
+    jobs = list()
+    for item in db_sess.query(Jobs).all():
+        item_dict = item.to_dict()
+        job = dict()
+        job['Title of activity'] = item_dict['job']
+        leader = db_sess.query(User).filter(User.id == item_dict['team_leader']).first().to_dict()
+        job['Team leader'] = f"{leader['name']} {leader['surname']}"
+        job['Duration'] = f"{item_dict['work_size']} hours"
+        job['List of collaborators'] = item_dict['collaborators']
+        job['Is finished'] = ['Is not finished', 'Is finished'][item_dict['is_finished']]
+        jobs.append((job, item_dict['id']))
+    return render_template('journal.html', jobs=jobs)
 
 
 @app.route('/logout')
