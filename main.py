@@ -6,6 +6,7 @@ from data import db_session
 from data.users import User
 from data.jobs import Jobs
 from login_form import LoginForm, RegistrationForm
+from add_job import JobsForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -32,7 +33,8 @@ def load_user(user_id):
 
 
 @app.route('/')
-def index():
+@login_required
+def main():
     jobs = list()
     for item in db_sess.query(Jobs).all():
         item_dict = item.to_dict()
@@ -47,17 +49,22 @@ def index():
     return render_template('journal.html', jobs=jobs)
 
 
+@app.route('/index')
+def index():
+    return render_template('base.html', title='Главная страница')
+
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect("/")
+    return redirect('/index')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit(): 
+    if form.validate_on_submit():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
@@ -85,8 +92,27 @@ def register():
             user = User(**user_params)
             db_sess.add(user)
             db_sess.commit()
-            return redirect('/')
+            return redirect('/index')
     return render_template('register.html', **params)
+
+
+@app.route('/add_job', methods=['GET', 'POST'])
+@login_required
+def add_job():
+    form = JobsForm()
+    fields = ['job', 'team_leader', 'work_size', 'collaborators']
+    params = {'title': 'Добавление работы',
+              'fields': fields,
+              'form': form,
+              'message': ''}
+    if form.validate_on_submit():
+        job_params = {field: getattr(form, field).data for field in fields}
+        job_params['is_finished'] = form.is_finished.data
+        job = Jobs(**job_params)
+        db_sess.add(job)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('add_job.html', **params)
 
 
 if __name__ == '__main__':
