@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="display: inline-block">Register Form</h1>
+<div class="text-danger">{{ message }}</div>
+<form action="" method="post" novalidate>
+	{{ form.hidden_tag() }}
+	{% for field in fields %}
+		<p>
+		{% set form_field = form[field] %}
+		{{ form_field.label }}<br>
+		{% if "password" in field %}
+			{{ form_field(class="form-control", type="password") }}
+		{% else %}
+			{{ form_field(class="form-control") }}
+		{% endif %}
+		{% for error in form_field.errors %}
+    			<div class="alert alert-danger" role="alert">
+    			{{ error }}
+    			</div>
+		{% endfor %}
+		</p>
+	{% endfor %}
+<p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+</form>
+{% endblock %}

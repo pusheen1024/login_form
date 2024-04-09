@@ -1,0 +1,39 @@
+.mars-one{
+float: right;
+padding-top: 10px;
+}
+.name{
+margin-left: 450px;
+}
+.login-buttons{
+margin-left: 500px;
+}
+.edit-buttons{
+padding-top: 20px;
+padding-bottom: 20px;
+}
+.add-job{
+margin-top: 20px;
+}
+h4{
+color: lightgrey;
+padding-left: 20px;
+}
+th{
+background-color: #dddddd;
+padding-top: 10px;
+padding-bottom: 10px;
+padding-left: 10px;
+padding-right: 10px;
+}
+td{
+background-color: #eeeeff;
+padding-top: 10px;
+padding-bottom: 10px;
+padding-left: 10px;
+padding-right: 10px;
+}
+table, th, td{
+width: 100%;
+border: 1px solid black;
+}

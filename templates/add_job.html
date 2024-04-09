@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="display: inline-block">Adding a job</h1>
+<form action="" method="post" novalidate>
+	{{ form.hidden_tag() }}
+	{% for field in fields %}
+		<p>
+		{% set form_field = form[field] %}
+		{{ form_field.label }}<br>
+		{{ form_field(class="form-control") }}
+		{% for error in form_field.errors %}
+    			<div class="alert alert-danger" role="alert">
+    			{{ error }}
+    			</div>
+		{% endfor %}
+		</p>
+	{% endfor %}
+<p>{{ form.is_finished() }} {{ form.is_finished.label }}</p>
+<p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+</form>
+{% endblock %}
