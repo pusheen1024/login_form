@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash
 
 from data import db_session
@@ -14,7 +14,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 db_session.global_init('db/mars.db')
 db_sess = db_session.create_session()
-user_settings = dict()
 
 
 @login_manager.user_loader
@@ -48,7 +47,6 @@ def index():
 @login_required
 def logout():
     logout_user()
-    user_settings['id'] = None
     return redirect('/index')
 
 
@@ -59,7 +57,6 @@ def login():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            user_settings['id'] = user.id
             return redirect('/')
         return render_template('login.html', message='Неправильный логин или пароль', form=form)
     return render_template('login.html', title='Авторизация', form=form)
@@ -110,7 +107,7 @@ def add_job():
 @login_required
 def edit_job(jobs_id):
     job = db_sess.query(Jobs).get(jobs_id)
-    if user_settings['id'] not in (1, job.team_leader):
+    if current_user.id not in (1, job.team_leader):
         return render_template('error.html', message='Access denied')
     form = JobsForm()
     fields = ['job', 'team_leader', 'work_size', 'collaborators']
@@ -131,7 +128,12 @@ def edit_job(jobs_id):
 @app.route('/delete_job/<int:jobs_id>', methods=['GET', 'POST'])
 @login_required
 def delete_job(jobs_id):
-    return '<h1>Not implemented :)</h1>'
+    job = db_sess.query(Jobs).get(jobs_id)
+    if current_user.id not in (1, job.team_leader):
+        return render_template('error.html', message='Access denied')
+    db_sess.delete(job)
+    db_sess.commit()
+    return redirect('/')
 
 
 @app.errorhandler(401)
