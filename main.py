@@ -34,7 +34,8 @@ def main():
         job['Duration'] = f"{item_dict['work_size']} hours"
         job['List of collaborators'] = item_dict['collaborators']
         job['Is finished'] = ['Is not finished', 'Is finished'][item_dict['is_finished']]
-        jobs.append((job, item_dict['id']))
+        can_edit = current_user.id in (1, item_dict['team_leader'])
+        jobs.append((job, item_dict['id'], can_edit))
     return render_template('journal.html', jobs=jobs)
 
 
