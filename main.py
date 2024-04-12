@@ -108,8 +108,6 @@ def add_job():
 @login_required
 def edit_job(jobs_id):
     job = db_sess.query(Jobs).get(jobs_id)
-    if current_user.id not in (1, job.team_leader):
-        return render_template('error.html', message='Access denied')
     form = JobsForm()
     fields = ['job', 'team_leader', 'work_size', 'collaborators']
     params = {'title': 'Добавление работы',
@@ -118,11 +116,13 @@ def edit_job(jobs_id):
     if form.validate_on_submit():
         for field in fields:
             setattr(job, field, getattr(form, field).data)
+        job.is_finished = form.is_finished.data
         db_sess.commit()
         return redirect('/')
     else:
         for field in fields:
-            setattr(getattr(form, field), 'data', getattr(job, field))      
+            setattr(getattr(form, field), 'data', getattr(job, field))
+        form.is_finished.data = job.is_finished
         return render_template('add_job.html', **params)
 
 
@@ -130,8 +130,6 @@ def edit_job(jobs_id):
 @login_required
 def delete_job(jobs_id):
     job = db_sess.query(Jobs).get(jobs_id)
-    if current_user.id not in (1, job.team_leader):
-        return render_template('error.html', message='Access denied')
     db_sess.delete(job)
     db_sess.commit()
     return redirect('/')
