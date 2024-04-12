@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+<div align='center'><h1>List of departments</h1></div>
+<div>
+<a class="btn btn-secondary to-jobs" href="/jobs">Back to jobs</a>
+<a class="btn btn-secondary add-department" href="/add_department">Add a department</a>
+</div>
+{% for item in jobs %}
+	<h2>Department # {{ item[1] }}</h2>
+	<table>
+		<tr>
+		{% for key in item[0].keys() %}
+		<th>{{ key }}</th>
+		{% endfor %}
+		</tr>
+		<tr>
+		{% for value in item[0].values() %}
+		<td>{{ value }}</td>
+		{% endfor %}
+		</tr>
+	</table>
+	{% if item[2] %}
+		<div class="edit-buttons">
+		<a class="btn btn-warning" href="/edit_department/{{ loop.index }}">Edit department</a>
+		<a class="btn btn-danger" href="/delete_department/{{ loop.index }}">Delete department</a>
+		</div>
+	{% endif %}
+{% endfor %}
+</div>
+{% endblock %}

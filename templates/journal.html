@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+<div align='center'><h1>Works log</h1></div>
+<div>
+<a class="btn btn-secondary to-departments" href="/departments">To departments</a>
+{% for item in jobs %}
+	<h2>Action # {{ item[1] }}</h2>
+	<table>
+		<tr>
+		{% for key in item[0].keys() %}
+		<th>{{ key }}</th>
+		{% endfor %}
+		</tr>
+
+		<tr>
+		{% for value in item[0].values() %}
+		{% if loop.last %}
+		<td style='background-color: #ffeeff'>{{ value }}</td>
+		{% else %}
+		<td>{{ value }}</td>
+		{% endif %}
+		{% endfor %}
+		</tr>
+	</table>
+	{% if item[2] %}
+		<div class="edit-buttons">
+		<a class="btn btn-warning" href="/edit_job/{{ loop.index }}">Edit job</a>
+		<a class="btn btn-danger" href="/delete_job/{{ loop.index }}">Delete job</a>
+		</div>
+	{% endif %}
+{% endfor %}
+</div>
+<div align="center">
+<a class="btn btn-primary add-job" href="/add_job">Add job</a>
+</div>
+{% endblock %}
