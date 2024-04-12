@@ -1,5 +1,6 @@
 import datetime
 import sqlalchemy
+import sqlalchemy.orm as orm
 from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
@@ -12,5 +13,6 @@ class Jobs(SqlAlchemyBase, SerializerMixin):
     job = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     work_size = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     collaborators = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    hazard_category = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     start_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     is_finished = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)

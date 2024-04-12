@@ -6,9 +6,11 @@ from data import db_session
 from data.users import User
 from data.jobs import Jobs
 from data.departments import Departments
+from data.hazard import Hazard
 from login_form import LoginForm, RegistrationForm
 from add_job import JobsForm
 from add_department import DepartmentsForm
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -35,6 +37,7 @@ def jobs():
         job['Team leader'] = f"{leader['name']} {leader['surname']}"
         job['Duration'] = f"{item_dict['work_size']} hours"
         job['List of collaborators'] = item_dict['collaborators']
+        job['Hazard category'] = db_sess.query(Hazard).filter(Hazard.id == item_dict['hazard_category']).first().category
         job['Is finished'] = ['Is not finished', 'Is finished'][item_dict['is_finished']]
         can_edit = current_user.id in (1, item_dict['team_leader'])
         jobs.append((job, item_dict['id'], can_edit))
@@ -109,7 +112,7 @@ def register():
 @login_required
 def add_job():
     form = JobsForm()
-    fields = ['job', 'team_leader', 'work_size', 'collaborators']
+    fields = ['job', 'team_leader', 'work_size', 'collaborators', 'hazard_category']
     params = {'title': 'Добавление работы',
               'fields': fields,
               'form': form,
@@ -128,10 +131,8 @@ def add_job():
 @login_required
 def edit_job(jobs_id):
     job = db_sess.query(Jobs).get(jobs_id)
-    if current_user.id not in (1, job.team_leader):
-        return render_template('error.html', message='Access denied')
     form = JobsForm()
-    fields = ['job', 'team_leader', 'work_size', 'collaborators']
+    fields = ['job', 'team_leader', 'work_size', 'collaborators', 'hazard_category']
     params = {'title': 'Добавление работы',
               'fields': fields,
               'form': form,
@@ -139,11 +140,13 @@ def edit_job(jobs_id):
     if form.validate_on_submit():
         for field in fields:
             setattr(job, field, getattr(form, field).data)
+        job.is_finished = form.is_finished.data
         db_sess.commit()
         return redirect('/jobs')
     else:
         for field in fields:
-            setattr(getattr(form, field), 'data', getattr(job, field))      
+            setattr(getattr(form, field), 'data', getattr(job, field))
+        form.is_finished.data = job.is_finished
         return render_template('add_entry.html', **params)
 
 
@@ -155,7 +158,7 @@ def delete_job(jobs_id):
         return render_template('error.html', message='Access denied')
     db_sess.delete(job)
     db_sess.commit()
-    return redirect('/')
+    return redirect('/jobs')
 
 
 @app.route('/add_department', methods=['GET', 'POST'])
@@ -193,7 +196,7 @@ def edit_department(department_id):
         return redirect('/departments')
     else:
         for field in fields:
-            setattr(getattr(form, field), 'data', getattr(department, field))      
+            setattr(getattr(form, field), 'data', getattr(department, field))
         return render_template('add_entry.html', **params)
 
 

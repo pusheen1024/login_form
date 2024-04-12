@@ -16,7 +16,7 @@
         <div class="container-fluid">
     		<h1>Миссия Колонизация Марса</h1>
 		{% if current_user.is_authenticated %}
-                <a class="btn btn-danger" href="/">На главную</a>
+                <a class="btn btn-danger" href="/jobs">На главную</a>
         	<a class="navbar-brand name" href="/logout">{{ current_user.name }} {{ current_user.surname }}</a>
         	{% else %}
 		<div class="login-buttons">
